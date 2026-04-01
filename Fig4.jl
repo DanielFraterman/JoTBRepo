@@ -74,20 +74,24 @@ function phi_k(k)
     Plot = Vector(undef,klen)
 
     # Contour plots phi*p for each k value
-    Plot[1] = Plots.contourf(pRan,qRan,phiVector[1],clims=(60,66.3809),cbar=false,color=CustomGrad)
+    Plot[1] = Plots.contourf(pRan,qRan,phiVector[1],clims=(60,maximum(maximum.(phiVector))),cbar=false,color=CustomGrad)
     Plots.scatter!([ESSP[1]],[ESSQ[1]],label=L"(p^*,q^*)")
+    kTitle = k[1]
+    Plots.title!(L"k=%$kTitle")
     ylabel!(L"q")
     for i in 2:klen
-        Plot[i] = Plots.contourf(pRan,qRan,phiVector[i],clims=(60,66.3809),cbar=false,yaxis=false,color=CustomGrad)
-        Plots.scatter!([ESSP[i]],[ESSQ[i]],label=L"(p^*,q^*)")
+        kTitle = k[i]
+        Plot[i] = Plots.contourf(pRan,qRan,phiVector[i],clims=(60,maximum(maximum.(phiVector))),cbar=false,yaxis=false,color=CustomGrad)
+        Plots.scatter!([ESSP[i]],[ESSQ[i]],label=L"(p^*,q^*)",labels=false)
+        Plots.title!(L"k=%$kTitle")
     end
 
     # Combines all plots
-    Plot1 = Plots.plot(Plot...,layout = (1,klen), right_margin=[-5mm -5mm 0mm], left_margin=[0mm -5mm -5mm])
+    Plot1 = Plots.plot(Plot...,layout = (1,klen), right_margin=[-5mm -5mm -5mm 0mm], left_margin=[0mm -5mm -5mm -5mm])
     xlabel!(L"p")
 
     # Return plot
     return Plot1
 end
 
-phi_k([2.2,2.3,2.4])
+phi_k([1.2,2.3,2.4,3.0])

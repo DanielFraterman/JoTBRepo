@@ -57,7 +57,7 @@ function evolution(p::Float32,q::Float32,g,gamma,alpha,k,wMax,I)
 
     # Finding steady state of the resident system
     par = [alpha,k,p,gamma,q,g,phi,delta,wMax]
-    ode = SteadyStateProblem(dmdt,[0;10;0;zeros(Int64,wMax)],par)
+    ode = SteadyStateProblem(dmdt,[0;1;0;zeros(Int64,wMax)],par)
     sol = solve(ode,DynamicSS(Rodas5()))
     ybar = sol.u[1]
     sbar = sol.u[2]
@@ -76,22 +76,22 @@ function evolution(p::Float32,q::Float32,g,gamma,alpha,k,wMax,I)
         
         # Ensuring p,q remain in unit square
         if pI > 1
-            pI = 1.0
+            pI = 1.0f0
         elseif pI < 0
-            pI = 0.0
+            pI = 0.0f0
         end
         if qI > 1
-            qI = 1.0
+            qI = 1.0f0
         elseif qI < 0
-            qI = 0.0
+            qI = 0.0f0
         end
 
         # Get phi and delta for mutants
         phiI, deltaI = PhiDelta(pI,qI)
 
         # Check for sucessful invasion
-        nprod = prod(gamma*(1:(wMax-1)) + ybar*(1 -qI)./(1:(wMax-1)))
-        INV = factorial(wMax-1)*(k*(1-pI)*ybar- gamma)*(wMax*gamma +(1 -qI) *ybar/wMax+g*(1-zbar))*nprod + k*pI*phiI*ybar^(wMax)*(1-qI).^(wMax-1)*g*(1-zbar) > 0 # Invasion condition
+        nprod = prod(gamma .+ ybar*(1 -qI)./(1:(wMax-1)))
+        INV = factorial(wMax-1)*(k*(1-pI)*ybar- gamma)*(gamma +(1 -qI) *ybar/wMax+g*(1-zbar))*nprod + k*pI*phiI*ybar^(wMax)*(1-qI)^(wMax-1)*g*(1-zbar) > 0 # Invasion condition
          
         # Runs if invasion successful
         if INV
@@ -101,7 +101,7 @@ function evolution(p::Float32,q::Float32,g,gamma,alpha,k,wMax,I)
             phi = phiI
             delta = deltaI
             par = [alpha,k,p,gamma,q,g,phi,delta,wMax]
-            ode = SteadyStateProblem(dmdt,[0;10;0;zeros(Int64,wMax)],par)
+            ode = SteadyStateProblem(dmdt,[0;1;0;zeros(Int64,wMax)],par)
             sol = solve(ode,DynamicSS(Rodas5()))
             ybar = sol.u[1]
             sbar = sol.u[2]
@@ -153,9 +153,9 @@ function css(alpha,wMax,k)
     CustomGrad = cgrad([RGB(1,1,1),RGB(127/255,205/255,187/255),RGB(44/255,127/255,184/255)])
 
     CSSPlotP = Plots.contourf(G,Gamma,CSSP,color=CustomGrad)
-    Plots.xlabel!("G"); Plots.ylabel!("Gamma"); Plots.title!("Final p")
+    Plots.xlabel!(L"$g'$"); Plots.ylabel!(L"$\gamma'$"); Plots.title!(L"$p^*$")
     CSSPlotQ = Plots.contourf(G,Gamma,CSSQ,color=CustomGrad)
-    Plots.xlabel!("G"); Plots.ylabel!("Gamma"); Plots.title!("Final q")
+    Plots.xlabel!(L"$g'$"); Plots.ylabel!(L"$\gamma'$"); Plots.title!(L"$q^*$")
     return Plots.plot(CSSPlotP,CSSPlotQ)
 end
 

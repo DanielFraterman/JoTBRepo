@@ -29,35 +29,21 @@ for i in eachindex(q)
 end
 
 
-# Plotting
-ScatterComp = plot(layout=(1,length(k)))
+## Plotting
+# ScatterComp = plot(layout=(1,length(k)))
+ScatterPlots = Vector{Any}(undef,length(k))
 y = [0.5,1.0,1.5,2.0,2.5] * 10^4
 for i in eachindex(q)
     Q = q[i]; P = p[i]
-    scatter!(Times[i,:],Scells[i,:],labels=[L"k=1.2" L"k=3.0" L"k=10.0"],alpha=0.1,markersize=2,markerstrokewidth=0,xlims=[0,10],ylims=[0,25000],yaxis=(formatter=y->string(round(y / 10^4,sigdigits=2))),subplot=i)
-    plot!(title=latexstring("\$q=$(Q)\$, \$p=$(P)\$"),subplot=i)
+    ScatterPlots[i] = scatter(Times[i,:],Scells[i,:],labels=[L"k=1.2" L"k=3.0" L"k=10.0"],legend=:bottomright,alpha=0.1,markersize=2,markerstrokewidth=0,xlims=[0,10],ylims=[0,25000],yaxis=(formatter=y->string(round(y / 10^4,sigdigits=2))))
+    plot!(title=latexstring("\$q=$(Q)\$, \$p=$(P)\$"))
     if i == 1
-        annotate!([(-1, maximum(y) * 1.05, Plots.text(L"\times10^{4}", 11, :black, :center))],subplot=1)
+        annotate!([(-1, maximum(y) * 1.05, Plots.text(L"\times10^{4}", 11, :black, :center))])
     else
-        plot!(legend=false,subplot=i)
+        plot!(legend=false)
     end
+    xlabel!("Time of mat death"); ylabel!("Number of S cells",subplot=1)
+    bar!(labels=false,inset=bbox(0.8,0.25,0.15,0.15),subplot=2,xticks=false,[sum(Scells[i,1] .< 10)/n,sum(Scells[i,2] .< 10)/n,sum(Scells[i,3] .< 10)/n],fillcolor = [1,2,3])
+    yaxis!([0,0.5],subplot=2); ylabel!("Fail %",subplot=2)
 end
-ScatterComp
-xlabel!("Time of mat death"); ylabel!("Number of S cells",subplot=1)
-
-
-# Plotting as histogram
-ScatterComp = plot(layout=(1,length(k)))
-y = [0.5,1.0,1.5,2.0,2.5] * 10^4
-for i in eachindex(q)
-    Q = q[i]; P = p[i]
-    scatter!(Times[i,:],Scells[i,:],labels=[L"k=1.2" L"k=3.0" L"k=10.0"],markersize=2,markerstrokewidth=0,xlims=[0,10],ylims=[0,25000],yaxis=(formatter=y->string(round(y / 10^4,sigdigits=2))),alpha = 0.1,subplot=i)
-    plot!(title=latexstring("\$q=$(Q)\$, \$p=$(P)\$"),subplot=i)
-    if i == 1
-        annotate!([(-1, maximum(y) * 1.05, Plots.text(L"\times10^{4}", 11, :black, :center))],subplot=1)
-    else
-        plot!(legend=false,subplot=i)
-    end
-end
-ScatterComp
-xlabel!("Time of mat death"); ylabel!("Number of S cells",subplot=1)
+plot(ScatterPlots...,layout = (1,length(k)))

@@ -90,3 +90,13 @@ end
 CumPlot
 plot!([1], [0], linestyle = :dash, label = "Daughters of SM cells", color = "black")
 plot!([1], [0], label = "Daughters of WS cells", color = "black")
+
+## Pie chart of mat makeup at end of life
+
+PiePlots = Vector{Any}(undef,length(k))
+for i in eachindex(k)
+    PiePlots[i] = plot(title="k="*string(k[i]),framestyle = :box,ticks=false,grid=false,title_location=:left)
+    pie!(["WS cells","SM cells"],[wBw[i][end]+sBw[i][end],wBs[i][end]+sBs[i][end]],inset =bbox(0.07,0.16,0.43,0.78),seriescolor = ["#FDBF03","#FF0000"],legend=:topright,legendfont=font(7),subplot=2)
+    pie!(["Cells produced by WS cells","Cells produced by SM cells"],[wBs[i][end]+wBw[i][end],sBw[i][end]+sBs[i][end]],inset =bbox(0.5,0.16,0.43,0.78),legend=:topright,seriescolor = ["#FDBF03","#FF0000"],legendfont=font(7),subplot=3)
+end
+PiePlot = plot(PiePlots...,layout = (2,1))

@@ -3,7 +3,7 @@ using Plots, Distributions, ProgressBars, LaTeXStrings, Measures
 include("tau_leaping_alg.jl")
 
 N = 101 # Number of grid points per Axis
-nSamples = 100 # Samples per mean
+nSamples = 10000 # Samples per mean
 
 C = 50000 # Maximum size of mat
 k = 1.2 # Additional growth parameter for S cells
@@ -43,24 +43,27 @@ function keyQuants(N,nSamples,C,k)
 
     CustomGrad = cgrad([RGB(1,1,1),RGB(127/255,205/255,187/255),RGB(44/255,127/255,184/255)])
 
-    Plot0 = plot(layout=grid(1,4,widths=(94/200,6/200,94/200,6/200)),bottom_margin=5mm)
+    Plot0 = plot(tickfontsize=11,guidefontsize=16,titlefontsize=16,layout=grid(1,6,widths=(1/202,94/202,6/202,1/202,94/202,6/202)),size=(1200,400),bottom_margin=8mm,top_margin=4mm)
     tic1 = collect(range(extrema(Phi.*ran')..., 16))
     tic12 = tic1[2:end] .- (tic1[2]-tic1[1])/2
-    contourf!(ran,ran,Phi.*ran',left_margin=5mm,levels=tic1,color=CustomGrad,colorbar=false,subplot=1)
-    scatter!([1],[0.33],label=false,subplot = 1)
-    xlabel!(L"p",subplot=1); ylabel!(L"q",subplot=1); title!(L"p\phi",subplot=1) 
-    heatmap!([1], tic12, [tic12;;],ylims=[0,maximum(tic1)],right_margin=5mm,c=CustomGrad, colorbar=false, xaxis=false, ymirror=true,categorical = true, yticks=optimize_ticks(extrema(tic12)...;k_min=8,k_max=9)[1],tick_direction=:out,subplot=2)
+    contourf!(ran,ran,Phi.*ran',left_margin=5mm,levels=tic1,color=CustomGrad,colorbar=false,subplot=2)
+    scatter!([1],[0.33],label=false,markersize=6,subplot=2)
+    xlabel!(L"p",subplot=2); ylabel!(L"q",subplot=2); title!(L"p\phi",subplot=2) 
+    heatmap!([1], tic12, [tic12;;],ylims=[0,maximum(tic1)],right_margin=5mm,c=CustomGrad, colorbar=false, xaxis=false, ymirror=true,categorical = true, yticks=optimize_ticks(extrema(tic12)...;k_min=8,k_max=9)[1],tick_direction=:out,subplot=3)
+    plot!(subplot=2,label=false,[0,0.1,0.1,0,0],[0,0,0.1,0.1,0],color=:black)
+
     tic2 = collect(range(extrema(log10.(PhiLog.*ranLog'))..., 16))
     tic22 = tic2[2:end] .- (tic2[2]-tic2[1])/2
     lev = 10 .^tic22
-    contourf!(ranLog,ranLog,PhiLog.*ranLog',left_margin=5mm,right_margin=5mm,levels=lev,axis=:log10,color=CustomGrad,colorbar=false,subplot=3)
-    xlabel!(L"\log{(p)}",subplot=3); ylabel!(L"\log{(q)}",subplot=3); title!(L"p\phi",subplot=3) 
-    heatmap!([1], lev, [tic22;;],c=CustomGrad,right_margin=5mm, colorbar=false, xaxis=false, ymirror=true,categorical = true,yaxis=:log10, yticks=10 .^optimize_ticks(extrema(tic22)...;k_min=8,k_max=9)[1],tick_direction=:out,subplot=4)
-    contour!(ranLog,ranLog,PhiLog.*ranLog',clabels=true,levels=[0.2],subplot=3)
+    contourf!(ranLog,ranLog,PhiLog.*ranLog',left_margin=5mm,right_margin=5mm,levels=lev,axis=:log10,color=CustomGrad,colorbar=false,subplot=5)
+    xlabel!(L"\log{(p)}",subplot=5); ylabel!(L"\log{(q)}",subplot=5); title!(L"p\phi",subplot=5) 
+    heatmap!([1], lev, [tic22;;],c=CustomGrad,right_margin=5mm, colorbar=false, xaxis=false, ymirror=true,categorical = true,yaxis=:log10, yticks=10 .^optimize_ticks(extrema(tic22)...;k_min=8,k_max=9)[1],tick_direction=:out,subplot=6)
+    contour!(ranLog,ranLog,PhiLog.*ranLog',clabels=true,levels=[0.2],subplot=5)
+    annotate!([0],[1.02],["(a)"],subplot=1,grid=false,ticks=false,axis=false,right_margin=-5mm,left_margin=2mm)
+    annotate!([0],[1.02],["(b)"],subplot=4,grid=false,ticks=false,axis=false,right_margin=-5mm)
 
-    Plot1 = plot(grid=false,axis=false)
-    annotate!([0.19,0.75],[0,0],["(a)","(b)"])
-    return plot(Plot0,Plot1,layout=grid(2,1,heights=(97/100,3/100)),size=(1200,412))
+
+    return Plot0
 end
 
 keyQuants(N,nSamples,C,k)
